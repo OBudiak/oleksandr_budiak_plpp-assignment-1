@@ -1,15 +1,15 @@
 ﻿#include <stdio.h>
 #include <stdlib.h>
 
-char   *readline(void);
-void    addText(char **text);
-void    addNewLine(char *text);
-void    saveInFile(char *text);
-void    loadFromFile(char *text);
-void    showText(char *text);
-void    insertTextOnPosition(char *text);
-void    searchText(char *text);
-char    chooseCommand(char command, char **text);
+char *readline(void);
+void addText(char **text);
+void addNewLine(char **text);
+void saveInFile(char **text);
+void loadFromFile(char **text);
+void showText(char **text);
+void insertTextOnPosition(char **text);
+void searchText(char **text);
+char chooseCommand(char command, char **text);
 
 char *readline(void) {
     size_t size = 64;
@@ -34,11 +34,7 @@ char *readline(void) {
     return buf;
 }
 
-void addText(char **text) {
-    printf("Write a text: ");
-    char *newText = readline();
-    if (!newText) return;
-
+void relocateMemory(char **text, char *newText) {
     size_t oldLen = 0;
     if (*text) {
         while ((*text)[oldLen] != '\0') {
@@ -65,12 +61,27 @@ void addText(char **text) {
     free(newText);
 }
 
-void addNewLine(char *text) { /* … */ (void)text; }
-void saveInFile(char *text) { /* … */ (void)text; }
-void loadFromFile(char *text) { /* … */ (void)text; }
-void showText(char *text) { printf("%s\n", text); }
-void insertTextOnPosition(char *text) { /* … */ (void)text; }
-void searchText(char *text){ /* … */ (void)text; }
+void addText(char **text) {
+    printf("Write a text: ");
+    char *newText = readline();
+    if (!newText) return;
+
+    relocateMemory(text, newText);
+}
+
+void addNewLine(char **text) {
+    char *newText = malloc(2);
+    if (!newText) return;
+    newText[0] = '\n';
+    newText[1] = '\0';
+    relocateMemory(text, newText);
+}
+
+void saveInFile(char **text) { /* … */ (void)text; }
+void loadFromFile(char **text) { /* … */ (void)text; }
+void showText(char **text) { printf("%s\n", *text); }
+void insertTextOnPosition(char **text) { /* … */ (void)text; }
+void searchText(char **text){ /* … */ (void)text; }
 
 char chooseCommand(char command, char **text) {
     if (command == '1') {
