@@ -8,7 +8,7 @@ char *readline(void);
 void addText(char **text);
 void addNewLine(char **text);
 void saveInFile(char **text);
-void loadFromFile(char **text);
+void loadFromFile();
 void showText(char **text);
 void insertTextOnPosition(char **text);
 void searchText(char **text);
@@ -86,6 +86,7 @@ void relocateMemory(char **text, char *newText, int x, int y) {
     for (size_t i = 0; i < addLen; i++) {
         (*text)[idx + i] = newText[i];
     }
+    (*text)[idx + addLen] = '\0';
 
     free(newText);
 }
@@ -106,8 +107,56 @@ void addNewLine(char **text) {
     relocateMemory(text, newText, -1,  -1);
 }
 
-void saveInFile(char **text) { /* … */ (void)text; }
-void loadFromFile(char **text) { /* … */ (void)text; }
+void saveInFile(char **text) {
+    FILE* file;
+    printf("Enter file name: ");
+    char* fileName = readline();
+    file = fopen(fileName, "w");
+    if (file != NULL)
+    {
+        fputs(*text, file);
+        fclose(file);
+    }
+}
+void loadFromFile() {
+    printf("Enter file name: ");
+    char *fileName = readline();
+    if (!fileName) return;
+
+    FILE *file = fopen(fileName, "r");
+    free(fileName);
+    if (!file) {
+        printf("Error opening file\n");
+        return;
+    }
+
+    size_t size = 128, len = 0;
+    char *buf = malloc(size);
+    if (!buf) {
+        fclose(file);
+        return;
+    }
+
+    int c;
+    while ((c = fgetc(file)) != EOF) {
+        if (len + 1 >= size) {
+            size *= 2;
+            char *tmp = realloc(buf, size);
+            if (!tmp) {
+                free(buf);
+                fclose(file);
+                return;
+            }
+            buf = tmp;
+        }
+        buf[len++] = (char)c;
+    }
+    buf[len] = '\0';
+
+    fclose(file);
+    printf("%s\n", buf);
+    free(buf);
+}
 void showText(char **text) { printf("%s\n", *text); }
 
 int powerF(int power) {
@@ -161,7 +210,7 @@ char chooseCommand(char command, char **text) {
     } else if (command == '3') {
         saveInFile(text);
     } else if (command == '4') {
-        loadFromFile(text);
+        loadFromFile();
     } else if (command == '5') {
         showText(text);
     } else if (command == '6') {
