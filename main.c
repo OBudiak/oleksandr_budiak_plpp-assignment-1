@@ -25,40 +25,69 @@ char *readline(int basicSize = 128) {
     return buf;
 }
 
-void choosCommand(char command) {
+void addText(char *text, char* input) {
+    char *newText = readline(input);
+    *input = newText;
+    *text += input;
+}
+
+char chooseCommand(char command, char* text, char* input) {
     if (command == '1') {
-        addText();
+        addText(text, input);
     }
     else if (command == '2') {
-        addNewLine();
+        addNewLine(text);
     }
     else if (command == '3') {
-        saveInFile();
+        saveInFile(text);
     }
     else if (command == '4') {
-        loadFromFile();
+        loadFromFile(text);
     }
     else if (command == '5') {
-        showText();
+        showText(text);
     }
     else if (command == '6') {
-        insertTextOnPosition();
+        insertTextOnPosition(text);
     }
     else if (command == '7') {
-        searchText();
+        searchText(text);
+    }
+    else if (command == '0') {
+        return "0";
     }
     else {
         (void)printf("Invalid command, please try again\n");
+        return "-1";
     }
-    return;
+    return command;
 }
 
 int main(void) {
-    printf("Command - \n");
-    char *s = readline();
-    if (s) {
-        printf("You wrote %s\n", s);
-        free(s);
+    char input;
+    char *command;
+    char wholeText;
+/*
+    char addText();
+    void addNewLine();
+    void saveInFile();
+    void loadFromFile();
+    void showText();
+    void insertTextOnPosition();
+    void searchText();
+*/
+    while (1) {
+        //*command = &readline();
+        command = chooseCommand(&readline(), &wholeText, &input);
+        if (command != '-1') {(void)printf("Command - %s\n", command);}
+        if (command == '0') { break;}
+
+        /*
+        if (s) {
+            (void)printf("You wrote %s\n", s);
+            free(s);
+        }
+        */
     }
     return 0;
 }
