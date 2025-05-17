@@ -1,5 +1,8 @@
 ﻿#include <stdio.h>
 #include <stdlib.h>
+#include <ctype.h>
+#include <iso646.h>
+#include <string.h>
 
 char *readline(void);
 void addText(char **text);
@@ -33,19 +36,14 @@ char *readline(void) {
     buf[len] = '\0';
     return buf;
 }
-
-void relocateMemory(char **text, char *newText) {
+void relocateMemory(char **text, char *newText, int x, int y) {
     size_t oldLen = 0;
     if (*text) {
-        while ((*text)[oldLen] != '\0') {
-            oldLen++;
-        }
+        while ((*text)[oldLen]) oldLen++;
     }
 
     size_t addLen = 0;
-    while (newText[addLen] != '\0') {
-        addLen++;
-    }
+    while (newText[addLen]) addLen++;
 
     char *tmp = realloc(*text, oldLen + addLen + 1);
     if (!tmp) {
@@ -54,8 +52,39 @@ void relocateMemory(char **text, char *newText) {
     }
     *text = tmp;
 
-    for (size_t i = 0; i <= addLen; i++) {
-        (*text)[oldLen + i] = newText[i];
+    size_t idx = 0, curX = 0, curY = 0;
+    if (x >= 0 && y >= 0) {
+        while (idx < oldLen && (curY < (size_t)y || curX < (size_t)x)) {
+            if ((*text)[idx] == '\n') {
+                curY++;
+                curX = 0;
+            } else {
+                curX++;
+            }
+            idx++;
+        }
+        if (idx > oldLen) idx = oldLen;
+    } else {
+        idx = oldLen;
+    }
+
+    char *src  = *text + idx;
+    char *dest = *text + idx + addLen;
+    size_t moveLen = oldLen - idx + 1;
+
+    if (dest > src) {
+        size_t i = moveLen;
+        while (i--) {
+            dest[i] = src[i];
+        }
+    } else {
+        for (size_t i = 0; i < moveLen; i++) {
+            dest[i] = src[i];
+        }
+    }
+
+    for (size_t i = 0; i < addLen; i++) {
+        (*text)[idx + i] = newText[i];
     }
 
     free(newText);
@@ -66,7 +95,7 @@ void addText(char **text) {
     char *newText = readline();
     if (!newText) return;
 
-    relocateMemory(text, newText);
+    relocateMemory(text, newText, -1, -1);
 }
 
 void addNewLine(char **text) {
@@ -74,13 +103,54 @@ void addNewLine(char **text) {
     if (!newText) return;
     newText[0] = '\n';
     newText[1] = '\0';
-    relocateMemory(text, newText);
+    relocateMemory(text, newText, -1,  -1);
 }
 
 void saveInFile(char **text) { /* … */ (void)text; }
 void loadFromFile(char **text) { /* … */ (void)text; }
 void showText(char **text) { printf("%s\n", *text); }
-void insertTextOnPosition(char **text) { /* … */ (void)text; }
+
+int powerF(int power) {
+    int result = 10;
+    if (power <= 0) { return 1; }
+    for (int i = 0; i < power; i++) {
+        result *= 10;
+    }
+    return result;
+}
+void insertTextOnPosition(char **text) {
+
+    printf("Write a position (x y) - ");
+    char *newText = readline();
+    if (!newText) return;
+    int x = 0, y = 0, counter = 0, power = 0;
+    char let;
+    for (int i = 0; i < strlen(newText); i++) {
+        let = newText[i];
+        if (isdigit((unsigned char)let)) {
+            if (counter == 0) {
+                x += (let - '0')*powerF(power);
+            } else if (counter == 1) {
+                y += (let - '0')*powerF(power);
+            } else if (counter == 2) {
+                break;
+            }
+            power++;
+            continue;
+        }
+        if (let == ' ') {
+            power = 0;
+            counter++;
+        }
+    }
+
+    printf("Write a text: ");
+    newText = readline();
+    if (!newText) return;
+
+    relocateMemory(text, newText, x, y);
+}
+
 void searchText(char **text){ /* … */ (void)text; }
 
 char chooseCommand(char command, char **text) {
