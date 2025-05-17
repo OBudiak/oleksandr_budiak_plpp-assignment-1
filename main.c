@@ -1,16 +1,26 @@
 ﻿#include <stdio.h>
 #include <stdlib.h>
 
-char *readline(int basicSize = 128) {
-    size_t size = basicSize;
-    size_t len = 0;
-    char *buf = malloc(size);
+char   *readline(void);
+void    addText(char **text);
+void    addNewLine(char *text);
+void    saveInFile(char *text);
+void    loadFromFile(char *text);
+void    showText(char *text);
+void    insertTextOnPosition(char *text);
+void    searchText(char *text);
+char    chooseCommand(char command, char **text);
+
+char *readline(void) {
+    size_t size = 64;
+    size_t len  = 0;
+    char* buf = malloc(size);
     if (!buf) return NULL;
 
     int c;
     while ((c = fgetc(stdin)) != EOF && c != '\n') {
         if (len + 1 >= size) {
-            size += basicSize;
+            size += 64;
             char *newbuf = realloc(buf, size);
             if (!newbuf) {
                 free(buf);
@@ -20,74 +30,88 @@ char *readline(int basicSize = 128) {
         }
         buf[len++] = c;
     }
-
     buf[len] = '\0';
     return buf;
 }
 
-void addText(char *text, char* input) {
-    char *newText = readline(input);
-    *input = newText;
-    *text += input;
+void addText(char **text) {
+    printf("Write a text: ");
+    char *newText = readline();
+    if (!newText) return;
+
+    size_t oldLen = 0;
+    if (*text) {
+        while ((*text)[oldLen] != '\0') {
+            oldLen++;
+        }
+    }
+
+    size_t addLen = 0;
+    while (newText[addLen] != '\0') {
+        addLen++;
+    }
+
+    char *tmp = realloc(*text, oldLen + addLen + 1);
+    if (!tmp) {
+        free(newText);
+        return;
+    }
+    *text = tmp;
+
+    for (size_t i = 0; i <= addLen; i++) {
+        (*text)[oldLen + i] = newText[i];
+    }
+
+    free(newText);
 }
 
-char chooseCommand(char command, char* text, char* input) {
+void addNewLine(char *text) { /* … */ (void)text; }
+void saveInFile(char *text) { /* … */ (void)text; }
+void loadFromFile(char *text) { /* … */ (void)text; }
+void showText(char *text) { printf("%s\n", text); }
+void insertTextOnPosition(char *text) { /* … */ (void)text; }
+void searchText(char *text){ /* … */ (void)text; }
+
+char chooseCommand(char command, char **text) {
     if (command == '1') {
-        addText(text, input);
-    }
-    else if (command == '2') {
+        addText(text);
+    } else if (command == '2') {
         addNewLine(text);
-    }
-    else if (command == '3') {
+    } else if (command == '3') {
         saveInFile(text);
-    }
-    else if (command == '4') {
+    } else if (command == '4') {
         loadFromFile(text);
-    }
-    else if (command == '5') {
+    } else if (command == '5') {
         showText(text);
-    }
-    else if (command == '6') {
+    } else if (command == '6') {
         insertTextOnPosition(text);
-    }
-    else if (command == '7') {
+    } else if (command == '7') {
         searchText(text);
-    }
-    else if (command == '0') {
-        return "0";
-    }
-    else {
-        (void)printf("Invalid command, please try again\n");
-        return "-1";
+    } else if (command == '0') {
+        return '0';
+    } else {
+        printf("Invalid command, please try again\n");
+        return (char)-1;
     }
     return command;
 }
 
 int main(void) {
-    char input;
-    char *command;
-    char wholeText;
-/*
-    char addText();
-    void addNewLine();
-    void saveInFile();
-    void loadFromFile();
-    void showText();
-    void insertTextOnPosition();
-    void searchText();
-*/
+    char *wholeText = NULL;
     while (1) {
-        //*command = &readline();
-        command = chooseCommand(&readline(), &wholeText, &input);
-        if (command != '-1') {(void)printf("Command - %s\n", command);}
-        if (command == '0') { break;}
+        printf("Write a command - ");
+        char *input = readline();
+        if (!input) break;
+        if (input[0] == '\0') { free(input); continue; }
 
-        /*
-        if (s) {
-            (void)printf("You wrote %s\n", s);
-            free(s);
-        }
-        */
+        char command = input[0];
+        printf("Command - %c\n", command);
+
+        chooseCommand(command, &wholeText);
+        free(input);
+
+        if (command == '0') break;
     }
+    free(wholeText);
     return 0;
 }
