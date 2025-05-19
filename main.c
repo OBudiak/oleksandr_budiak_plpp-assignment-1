@@ -200,7 +200,32 @@ void insertTextOnPosition(char **text) {
     relocateMemory(text, newText, x, y);
 }
 
-void searchText(char **text){ /* … */ (void)text; }
+void parseText(const char **text, const char *phrase) {
+    int line = 1;
+    int col = 0;
+    if (!*phrase)
+        return;
+    for (int i = 0; text[i] != '\0'; i++) {
+        if (text[i] == '\n') {
+            line++;
+            col = 0;
+            continue;
+        }
+        int j = 0;
+        while (phrase[j] != '\0' && text[i + j] != '\0' && text[i + j] == phrase[j]) {
+            j++;
+        }
+        if (phrase[j] == '\0') {
+            printf("\"%s\" — %d %d\n", phrase, line, col);
+        }
+        col++;
+    }
+}
+void searchText(char **text){
+    printf("Write phrase to search - ");
+    char *newText = readline();
+    parseText(text, newText);
+}
 
 char chooseCommand(char command, char **text) {
     if (command == '1') {
