@@ -92,6 +92,7 @@ void relocateMemory(char **text, char *newText, int x, int y) {
 }
 
 void addText(char **text) {
+    printf("  -Add text-  \n");
     printf("Write a text: ");
     char *newText = readline();
     if (!newText) return;
@@ -100,6 +101,7 @@ void addText(char **text) {
 }
 
 void addNewLine(char **text) {
+    printf("  -Add new line-  \n");
     char *newText = malloc(2);
     if (!newText) return;
     newText[0] = '\n';
@@ -108,6 +110,7 @@ void addNewLine(char **text) {
 }
 
 void saveInFile(char **text) {
+    printf("  -Save in file-  \n");
     FILE* file;
     printf("Enter file name: ");
     char* fileName = readline();
@@ -119,6 +122,7 @@ void saveInFile(char **text) {
     }
 }
 void loadFromFile() {
+    printf("  -Load from file-  \n");
     printf("Enter file name: ");
     char *fileName = readline();
     if (!fileName) return;
@@ -157,7 +161,7 @@ void loadFromFile() {
     printf("%s\n", buf);
     free(buf);
 }
-void showText(char **text) { printf("%s\n", *text); }
+void showText(char **text) { printf("  -Show text-  \n"); printf("%s\n", *text); }
 
 int powerF(int power) {
     int result = 10;
@@ -168,7 +172,7 @@ int powerF(int power) {
     return result;
 }
 void insertTextOnPosition(char **text) {
-
+    printf("  -Insert text by coordinate-  \n");
     printf("Write a position (x y) - ");
     char *newText = readline();
     if (!newText) return;
@@ -200,7 +204,48 @@ void insertTextOnPosition(char **text) {
     relocateMemory(text, newText, x, y);
 }
 
-void searchText(char **text){ /* … */ (void)text; }
+void searchText(char **text) {
+    printf("  -Search in text-  \n");
+    printf("Enter text: ");
+    char *phrase = readline();
+    if (!phrase || phrase[0] == '\0') {
+        printf("Empty search string\n\n");
+        free(phrase);
+        return;
+    }
+    if (!*text) {
+        printf("Text is empty\n\n");
+        free(phrase);
+        return;
+    }
+
+    char *t = *text;
+    int line = 0, col = 0, found = 0;
+    size_t len_text   = strlen(t);
+    size_t len_phrase = strlen(phrase);
+
+    for (size_t i = 0; i < len_text; i++) {
+        if (t[i] == '\n') {
+            line++;
+            col = 0;
+            continue;
+        }
+        if (i + len_phrase <= len_text &&
+            strncmp(&t[i], phrase, len_phrase) == 0)
+        {
+            printf("\"%s\" - %d %d\n", phrase, line, col);
+            found = 1;
+        }
+        col++;
+    }
+
+    if (!found) {
+        printf("\"%s\" was not found\n", phrase);
+    }
+    printf("\n");
+    free(phrase);
+}
+
 
 char chooseCommand(char command, char **text) {
     if (command == '1') {
@@ -227,6 +272,16 @@ char chooseCommand(char command, char **text) {
 }
 
 int main(void) {
+    printf("Welcome to text Editor V0.1\n");
+    printf("\nInstruction:\n");
+    printf("Add text/new line - 1, 2\n");
+    printf("Save in/load from file - 3, 4\n");
+    printf("Show text - 5\n");
+    printf("Insert text by coordinates - 6\n");
+    printf("Search in text - 7\n");
+    printf("Exit - 0\n\n");
+
+
     char *wholeText = NULL;
     while (1) {
         printf("Write a command - ");
@@ -235,7 +290,7 @@ int main(void) {
         if (input[0] == '\0') { free(input); continue; }
 
         char command = input[0];
-        printf("Command - %c\n", command);
+        // printf("Command - %c\n", command);
 
         chooseCommand(command, &wholeText);
         free(input);
