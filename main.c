@@ -8,7 +8,7 @@ char *readline(void);
 void addText(char **text);
 void addNewLine(char **text);
 void saveInFile(char **text);
-void loadFromFile();
+void loadFromFile(char **text);
 void showText(char **text);
 void insertTextOnPosition(char **text);
 void searchText(char **text);
@@ -121,7 +121,7 @@ void saveInFile(char **text) {
         fclose(file);
     }
 }
-void loadFromFile() {
+void loadFromFile(char **text) {
     printf("  -Load from file-  \n");
     printf("Enter file name: ");
     char *fileName = readline();
@@ -156,10 +156,12 @@ void loadFromFile() {
         buf[len++] = (char)c;
     }
     buf[len] = '\0';
-
     fclose(file);
-    printf("%s\n", buf);
-    free(buf);
+
+    free(*text);
+    *text = buf;
+
+    printf("%s\n", *text);
 }
 void showText(char **text) { printf("  -Show text-  \n"); printf("%s\n", *text); }
 
@@ -255,7 +257,7 @@ char chooseCommand(char command, char **text) {
     } else if (command == '3') {
         saveInFile(text);
     } else if (command == '4') {
-        loadFromFile();
+        loadFromFile(text);
     } else if (command == '5') {
         showText(text);
     } else if (command == '6') {
