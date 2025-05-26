@@ -5,6 +5,8 @@
 #include <string.h>
 
 char *readline(void);
+char chooseCommand(char command, char **text);
+
 void addText(char **text);
 void addNewLine(char **text);
 void saveInFile(char **text);
@@ -12,7 +14,14 @@ void loadFromFile(char **text);
 void showText(char **text);
 void insertTextOnPosition(char **text);
 void searchText(char **text);
-char chooseCommand(char command, char **text);
+
+void deleteText(char **text);
+void undoText(char **text);
+void redoText(char **text);
+void copyText(char **text);
+void pasteText(char **text);
+void cutText(char **text);
+void insertWithReplacement(char **text);
 
 char *readline(void) {
     size_t size = 64;
@@ -157,11 +166,9 @@ void loadFromFile(char **text) {
     }
     buf[len] = '\0';
     fclose(file);
-
     free(*text);
     *text = buf;
-
-    printf("%s\n", *text);
+    // printf("%s\n", *text);
 }
 void showText(char **text) { printf("  -Show text-  \n"); printf("%s\n", *text); }
 
