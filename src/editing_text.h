@@ -12,6 +12,12 @@ public:
     void addText();
     void addNewLine();
     void insertTextOnPosition();
+    void insertWithReplacement();
+
+    void deleteText();
+    void copyText();
+    void pasteText();
+    void cutText();
 
 private:
     Functionality& functionality;

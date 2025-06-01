@@ -19,6 +19,9 @@ public:
     void searchText();
     void showText();
 
+    void undoText();
+    void redoText();
+
 private:
     char* text;
 };

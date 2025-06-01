@@ -1,6 +1,4 @@
-﻿// main.cpp
-
-#include <iostream>
+﻿#include <iostream>
 #include <cstring>
 #include "src/functionality.cpp"
 #include "src/editing_text.cpp"
@@ -8,7 +6,6 @@
 using namespace std;
 
 void instruction() {
-    cout << "Welcome to text Editor V0.1" << endl;
     cout << endl << "Instruction:" << endl;
     cout << "Add text/new line - 1, 2" << endl;
     cout << "Save in/load from file - 3, 4" << endl;
@@ -42,6 +39,9 @@ int chooseCommand(char command, EditingText& editor, Functionality& func) {
         case '7':
             func.searchText();
             break;
+        case 'i':
+            instruction();
+            break;
         case '0':
             return 0;
         default:
@@ -52,6 +52,7 @@ int chooseCommand(char command, EditingText& editor, Functionality& func) {
 }
 
 int main() {
+    cout << "Welcome to text Editor V0.1" << endl;
     instruction();
 
     Functionality func;
@@ -67,7 +68,7 @@ int main() {
         }
 
         char command = input[0];
-        chooseCommand(command, editor, func);
+        (void)chooseCommand(command, editor, func);
         free(input);
 
         if (command == '0') break;
