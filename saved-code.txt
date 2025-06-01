@@ -1,13 +1,5 @@
-﻿#include <stdio.h>
-#include <stdlib.h>
-#include <ctype.h>
-#include <iso646.h>
-#include <string.h>
+﻿// char *readline(void);
 
-#include "functionality.cpp"
-#include "editing_text.cpp"
-
-char *readline(void);
 // char chooseCommand(char command, char **text);
 
 // void addText(char **text);
@@ -258,58 +250,3 @@ void searchText(char **text) {
     free(phrase);
 }
 */
-
-
-char chooseCommand(char command, char **text) {
-    if (command == '1') {
-        addText(text);
-    } else if (command == '2') {
-        addNewLine(text);
-    } else if (command == '3') {
-        saveInFile(text);
-    } else if (command == '4') {
-        loadFromFile(text);
-    } else if (command == '5') {
-        showText(text);
-    } else if (command == '6') {
-        insertTextOnPosition(text);
-    } else if (command == '7') {
-        searchText(text);
-    } else if (command == '0') {
-        return '0';
-    } else {
-        printf("Invalid command, please try again\n");
-        return (char)-1;
-    }
-    return command;
-}
-
-int main(void) {
-    printf("Welcome to text Editor V0.1\n");
-    printf("\nInstruction:\n");
-    printf("Add text/new line - 1, 2\n");
-    printf("Save in/load from file - 3, 4\n");
-    printf("Show text - 5\n");
-    printf("Insert text by coordinates - 6\n");
-    printf("Search in text - 7\n");
-    printf("Exit - 0\n\n");
-
-
-    char *wholeText = NULL;
-    while (1) {
-        printf("Write a command - ");
-        char *input = readline();
-        if (!input) break;
-        if (input[0] == '\0') { free(input); continue; }
-
-        char command = input[0];
-        // printf("Command - %c\n", command);
-
-        chooseCommand(command, &wholeText);
-        free(input);
-
-        if (command == '0') break;
-    }
-    free(wholeText);
-    return 0;
-}
