@@ -1,76 +1,76 @@
-﻿#include <stdio.h>
-#include <stdlib.h>
-#include <iostream>
-#include <string.h>
+﻿// main.cpp
 
+#include <iostream>
+#include <cstring>
 #include "src/functionality.cpp"
 #include "src/editing_text.cpp"
 
 using namespace std;
 
 void instruction() {
-    cout << "Welcome to text Editor V0.1\n";
-    cout <<("\nInstruction:\n");
-    cout <<("Add text/new line - 1, 2\n");
-    cout <<("Save in/load from file - 3, 4\n");
-    cout <<("Show text - 5\n");
-    cout <<("Insert text by coordinates - 6\n");
-    cout <<("Search in text - 7\n");
-    cout <<("Exit - 0\n\n");
+    cout << "Welcome to text Editor V0.1" << endl;
+    cout << endl << "Instruction:" << endl;
+    cout << "Add text/new line - 1, 2" << endl;
+    cout << "Save in/load from file - 3, 4" << endl;
+    cout << "Show text - 5" << endl;
+    cout << "Insert text by coordinates - 6" << endl;
+    cout << "Search in text - 7" << endl;
+    cout << "Instruction - i" << endl;
+    cout << "Exit - 0" << endl << endl;
 }
 
-
-int chooseCommand(char command, char **text) {
+int chooseCommand(char command, EditingText& editor, Functionality& func) {
     switch (command) {
         case '1':
-            addText(text);
+            editor.addText();
             break;
         case '2':
-            addNewLine(text);
+            editor.addNewLine();
             break;
         case '3':
-            saveInFile(text);
+            func.saveInFile();
             break;
         case '4':
-            loadFromFile(text);
+            func.loadFromFile();
             break;
         case '5':
-            showText(text);
+            func.showText();
             break;
         case '6':
-            insertTextOnPosition(text);
+            editor.insertTextOnPosition();
             break;
         case '7':
-            searchText(text);
+            func.searchText();
             break;
         case '0':
             return 0;
         default:
-            cout << "Invalid command, please try again\n" << endl;
+            cout << "Invalid command, please try again" << endl;
             return -1;
     }
     return command;
 }
 
-
-int main(void) {
+int main() {
     instruction();
 
-    char *wholeText = NULL;
-    while (1) {
-        printf("Write a command - ");
-        char *input = readline();
+    Functionality func;
+    EditingText editor(func);
+
+    while (true) {
+        cout << "Write a command - ";
+        char* input = func.readline();
         if (!input) break;
-        if (input[0] == '\0') { free(input); continue; }
+        if (input[0] == '\0') {
+            free(input);
+            continue;
+        }
 
         char command = input[0];
-        // printf("Command - %c\n", command);
-
-        (void)chooseCommand(command, &wholeText);
+        chooseCommand(command, editor, func);
         free(input);
 
         if (command == '0') break;
     }
-    free(wholeText);
     return 0;
 }

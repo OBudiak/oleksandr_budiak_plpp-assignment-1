@@ -1,57 +1,41 @@
 ﻿#include "editing_text.h"
-#include "functionality.h"
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
 
-void addText(char **text) {
-    printf("  -Add text-  \n");
-    printf("Write a text: ");
-    char *newText = readline();
+using namespace std;
+
+EditingText::EditingText(Functionality& func) : functionality(func) {}
+
+void EditingText::addText() {
+    cout << "  -Add text-  " << endl;
+    cout << "Write a text: ";
+    char* newText = functionality.readline();
     if (!newText) return;
-
-    relocateMemory(text, newText, -1, -1);
+    functionality.relocateMemory(newText, -1, -1);
 }
 
-void addNewLine(char **text) {
-    printf("  -Add new line-  \n");
-    char *newText = (char*)malloc(2);
+void EditingText::addNewLine() {
+    cout << "  -Add new line-  " << endl;
+    char* newText = (char*)malloc(2);
     if (!newText) return;
     newText[0] = '\n';
     newText[1] = '\0';
-    relocateMemory(text, newText, -1,  -1);
+    functionality.relocateMemory(newText, -1, -1);
 }
 
-void insertTextOnPosition(char **text) {
-    printf("  -Insert text by coordinate-  \n");
-    printf("Write a position (x y) - ");
-    char *newText = readline();
-    if (!newText) return;
-    int x = 0, y = 0, counter = 0, power = 0;
-    char let;
-    for (int i = 0; i < strlen(newText); i++) {
-        let = newText[i];
-        if (isdigit((unsigned char)let)) {
-            if (counter == 0) {
-                x += (let - '0')*powerF(power);
-            } else if (counter == 1) {
-                y += (let - '0')*powerF(power);
-            } else if (counter == 2) {
-                break;
-            }
-            power++;
-            continue;
-        }
-        if (let == ' ') {
-            power = 0;
-            counter++;
-        }
+void EditingText::insertTextOnPosition() {
+    cout << "  -Insert text by coordinate-  " << endl;
+    cout << "Write a position (x y) - ";
+    char* tmpInput = functionality.readline();
+    if (!tmpInput) return;
+    int x = 0, y = 0;
+    if (sscanf(tmpInput, "%d %d", &x, &y) != 2) {
+        cout << "Uncorrect coordinates" << endl;
+        free(tmpInput);
+        return;
     }
+    free(tmpInput);
 
-    printf("Write a text: ");
-    newText = readline();
+    cout << "Write a text: ";
+    char* newText = functionality.readline();
     if (!newText) return;
-
-    relocateMemory(text, newText, x, y);
+    functionality.relocateMemory(newText, x, y);
 }
-

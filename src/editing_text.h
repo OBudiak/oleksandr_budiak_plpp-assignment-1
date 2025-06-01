@@ -1,21 +1,20 @@
-﻿//
-// Created by Fujitsu-H770 on 26.05.2025.
-//
+﻿#ifndef EDITINGTEXT_H
+#define EDITINGTEXT_H
 
-#ifndef EDITING_TEXT_H
-#define EDITING_TEXT_H
+#include "functionality.h"
+#include <iostream>
+#include <cstdio>
+#include <cstdlib>
 
-#include <stddef.h>
+class EditingText {
+public:
+    EditingText(Functionality& func);
+    void addText();
+    void addNewLine();
+    void insertTextOnPosition();
 
-// буфер тексту
-void addText(char **text);
-void addNewLine(char **text);
-void insertTextOnPosition(char **text);
-void insertWithReplacement(char **text);
-
-void deleteText(char **text);
-void copyText(char **text);
-void pasteText(char **text);
-void cutText(char **text);
+private:
+    Functionality& functionality;
+};
 
 #endif
