@@ -1,0 +1,190 @@
+﻿#include "functionality.h"
+#include <stdlib.h>
+#include <ctype.h>
+#include <iso646.h>
+#include <string.h>
+
+char *readline(void) {
+    size_t size = 64;
+    size_t len  = 0;
+    char* buf = malloc(size);
+    if (!buf) return NULL;
+
+    int c;
+    while ((c = fgetc(stdin)) != EOF && c != '\n') {
+        if (len + 1 >= size) {
+            size += 64;
+            char *newbuf = realloc(buf, size);
+            if (!newbuf) {
+                free(buf);
+                return NULL;
+            }
+            buf = newbuf;
+        }
+        buf[len++] = c;
+    }
+    buf[len] = '\0';
+    return buf;
+}
+void relocateMemory(char **text, char *newText, int x, int y) {
+    size_t oldLen = 0;
+    if (*text) {
+        while ((*text)[oldLen]) oldLen++;
+    }
+
+    size_t addLen = 0;
+    while (newText[addLen]) addLen++;
+
+    char *tmp = realloc(*text, oldLen + addLen + 1);
+    if (!tmp) {
+        free(newText);
+        return;
+    }
+    *text = tmp;
+
+    size_t idx = 0, curX = 0, curY = 0;
+    if (x >= 0 && y >= 0) {
+        while (idx < oldLen && (curY < (size_t)y || curX < (size_t)x)) {
+            if ((*text)[idx] == '\n') {
+                curY++;
+                curX = 0;
+            } else {
+                curX++;
+            }
+            idx++;
+        }
+        if (idx > oldLen) idx = oldLen;
+    } else {
+        idx = oldLen;
+    }
+
+    char *src  = *text + idx;
+    char *dest = *text + idx + addLen;
+    size_t moveLen = oldLen - idx + 1;
+
+    if (dest > src) {
+        size_t i = moveLen;
+        while (i--) {
+            dest[i] = src[i];
+        }
+    } else {
+        for (size_t i = 0; i < moveLen; i++) {
+            dest[i] = src[i];
+        }
+    }
+
+    for (size_t i = 0; i < addLen; i++) {
+        (*text)[idx + i] = newText[i];
+    }
+    (*text)[idx + addLen] = '\0';
+
+    free(newText);
+}
+
+void saveInFile(char **text) {
+    printf("  -Save in file-  \n");
+    FILE* file;
+    printf("Enter file name: ");
+    char* fileName = readline();
+    file = fopen(fileName, "w");
+    if (file != NULL)
+    {
+        fputs(*text, file);
+        fclose(file);
+    }
+}
+void loadFromFile(char **text) {
+    printf("  -Load from file-  \n");
+    printf("Enter file name: ");
+    char *fileName = readline();
+    if (!fileName) return;
+
+    FILE *file = fopen(fileName, "r");
+    free(fileName);
+    if (!file) {
+        printf("Error opening file\n");
+        return;
+    }
+
+    size_t size = 128, len = 0;
+    char *buf = malloc(size);
+    if (!buf) {
+        fclose(file);
+        return;
+    }
+
+    int c;
+    while ((c = fgetc(file)) != EOF) {
+        if (len + 1 >= size) {
+            size *= 2;
+            char *tmp = realloc(buf, size);
+            if (!tmp) {
+                free(buf);
+                fclose(file);
+                return;
+            }
+            buf = tmp;
+        }
+        buf[len++] = (char)c;
+    }
+    buf[len] = '\0';
+    fclose(file);
+    free(*text);
+    *text = buf;
+    // printf("%s\n", *text);
+}
+
+int powerF(int power) {
+    int result = 10;
+    if (power <= 0) { return 1; }
+    for (int i = 0; i < power; i++) {
+        result *= 10;
+    }
+    return result;
+}
+
+void searchText(char **text) {
+    printf("  -Search in text-  \n");
+    printf("Enter text: ");
+    char *phrase = readline();
+    if (!phrase || phrase[0] == '\0') {
+        printf("Empty search string\n\n");
+        free(phrase);
+        return;
+    }
+    if (!*text) {
+        printf("Text is empty\n\n");
+        free(phrase);
+        return;
+    }
+
+    char *t = *text;
+    int line = 0, col = 0, found = 0;
+    size_t len_text   = strlen(t);
+    size_t len_phrase = strlen(phrase);
+
+    for (size_t i = 0; i < len_text; i++) {
+        if (t[i] == '\n') {
+            line++;
+            col = 0;
+            continue;
+        }
+        if (i + len_phrase <= len_text &&
+            strncmp(&t[i], phrase, len_phrase) == 0)
+        {
+            printf("\"%s\" - %d %d\n", phrase, line, col);
+            found = 1;
+        }
+        col++;
+    }
+
+    if (!found) {
+        printf("\"%s\" was not found\n", phrase);
+    }
+    printf("\n");
+    free(phrase);
+}
+
+void showText(char **text) { printf("  -Show text-  \n"); printf("%s\n", *text); }
+
+

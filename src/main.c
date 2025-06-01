@@ -4,25 +4,28 @@
 #include <iso646.h>
 #include <string.h>
 
+#include "functionality.cpp"
+#include "editing_text.cpp"
+
 char *readline(void);
-char chooseCommand(char command, char **text);
+// char chooseCommand(char command, char **text);
 
-void addText(char **text);
-void addNewLine(char **text);
-void saveInFile(char **text);
-void loadFromFile(char **text);
-void showText(char **text);
-void insertTextOnPosition(char **text);
-void searchText(char **text);
-
-void deleteText(char **text);
-void undoText(char **text);
-void redoText(char **text);
-void copyText(char **text);
-void pasteText(char **text);
-void cutText(char **text);
-void insertWithReplacement(char **text);
-
+// void addText(char **text);
+// void addNewLine(char **text);
+// void saveInFile(char **text);
+// void loadFromFile(char **text);
+// void showText(char **text);
+// void insertTextOnPosition(char **text);
+// void searchText(char **text);
+//
+// void deleteText(char **text);
+// void undoText(char **text);
+// void redoText(char **text);
+// void copyText(char **text);
+// void pasteText(char **text);
+// void cutText(char **text);
+// void insertWithReplacement(char **text);
+/*
 char *readline(void) {
     size_t size = 64;
     size_t len  = 0;
@@ -254,6 +257,7 @@ void searchText(char **text) {
     printf("\n");
     free(phrase);
 }
+*/
 
 
 char chooseCommand(char command, char **text) {
