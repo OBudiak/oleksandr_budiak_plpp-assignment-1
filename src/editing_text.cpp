@@ -15,7 +15,7 @@ void addText(char **text) {
 
 void addNewLine(char **text) {
     printf("  -Add new line-  \n");
-    char *newText = malloc(2);
+    char *newText = (char*)malloc(2);
     if (!newText) return;
     newText[0] = '\n';
     newText[1] = '\0';

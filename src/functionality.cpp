@@ -7,14 +7,14 @@
 char *readline(void) {
     size_t size = 64;
     size_t len  = 0;
-    char* buf = malloc(size);
+    char* buf = (char*)malloc(size);
     if (!buf) return NULL;
 
     int c;
     while ((c = fgetc(stdin)) != EOF && c != '\n') {
         if (len + 1 >= size) {
             size += 64;
-            char *newbuf = realloc(buf, size);
+            char *newbuf = (char*)realloc(buf, size);
             if (!newbuf) {
                 free(buf);
                 return NULL;
@@ -35,7 +35,7 @@ void relocateMemory(char **text, char *newText, int x, int y) {
     size_t addLen = 0;
     while (newText[addLen]) addLen++;
 
-    char *tmp = realloc(*text, oldLen + addLen + 1);
+    char *tmp = (char*)realloc(*text, oldLen + addLen + 1);
     if (!tmp) {
         free(newText);
         return;
@@ -107,7 +107,7 @@ void loadFromFile(char **text) {
     }
 
     size_t size = 128, len = 0;
-    char *buf = malloc(size);
+    char *buf = (char*)malloc(size);
     if (!buf) {
         fclose(file);
         return;
@@ -117,7 +117,7 @@ void loadFromFile(char **text) {
     while ((c = fgetc(file)) != EOF) {
         if (len + 1 >= size) {
             size *= 2;
-            char *tmp = realloc(buf, size);
+            char *tmp = (char*)realloc(buf, size);
             if (!tmp) {
                 free(buf);
                 fclose(file);
