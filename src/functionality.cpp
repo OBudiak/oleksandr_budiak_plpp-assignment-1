@@ -4,10 +4,12 @@ using namespace std;
 
 Functionality::Functionality() {
     text = NULL;
+    clipboard = NULL;
 }
 
 Functionality::~Functionality() {
     free(text);
+    free(clipboard);
 }
 
 char* Functionality::readline() {
@@ -35,6 +37,31 @@ char* Functionality::readline() {
 
 int Functionality::powerF(int power) {
     return (int)pow(10, power);
+}
+
+size_t Functionality::getGlobalIndex(int line, int index) {
+    if (!text) return 0;
+    size_t idx = 0, curX = 0, curY = 0;
+    size_t oldLen = 0;
+    while (text[oldLen]) oldLen++;
+
+    while (idx < oldLen && curY < (size_t)line) {
+        if (text[idx] == '\n') {
+            curY++;
+            curX = 0;
+        } else {
+            curX++;
+        }
+        idx++;
+    }
+    curX = 0;
+    while (idx < oldLen && curX < (size_t)index) {
+        if (text[idx] == '\n') break;
+        curX++;
+        idx++;
+    }
+    if (idx > oldLen) idx = oldLen;
+    return idx;
 }
 
 void Functionality::relocateMemory(char* newText, int x, int y) {
@@ -191,4 +218,94 @@ void Functionality::showText() {
     } else {
         cout << text << endl;
     }
+}
+
+void Functionality::deleteText(int line, int index, int count) {
+    if (!text || count <= 0) return;
+    size_t oldLen = strlen(text);
+    size_t idx = getGlobalIndex(line, index);
+    if (idx >= oldLen) return;
+
+    if ((size_t)count > oldLen - idx) {
+        count = (int)(oldLen - idx);
+    }
+
+    size_t newLen = oldLen - count;
+    memmove(text + idx, text + idx + count, oldLen - idx - count + 1);
+
+    char* tmp = (char*)realloc(text, newLen + 1);
+    if (tmp) {
+        text = tmp;
+    }
+}
+
+void Functionality::insertWithReplacement(int line, int index, const char* newText) {
+    if (!text) {
+        // якщо порожній, просто вставляємо новий
+        char* copyText = strdup(newText);
+        relocateMemory(copyText, -1, -1);
+        return;
+    }
+    size_t oldLen = strlen(text);
+    size_t addLen = strlen(newText);
+    size_t idx = getGlobalIndex(line, index);
+    if (idx > oldLen) idx = oldLen;
+
+    // Видаляємо символи довжиною newText, якщо вони є
+    if (idx < oldLen) {
+        size_t endRemove = idx + addLen;
+        if (endRemove > oldLen) endRemove = oldLen;
+        size_t removeCount = endRemove - idx;
+        memmove(text + idx, text + endRemove, oldLen - endRemove + 1);
+        oldLen = oldLen - removeCount;
+        char* shrink = (char*)realloc(text, oldLen + 1);
+        if (shrink) text = shrink;
+    }
+
+    // Вставляємо newText на позицію idx
+    char* copyText = strdup(newText);
+    relocateMemory(copyText, index, line);
+}
+
+void Functionality::copyText(int line, int index, int count) {
+    if (!text || count <= 0) return;
+    free(clipboard);
+    size_t oldLen = strlen(text);
+    size_t idx = getGlobalIndex(line, index);
+    if (idx >= oldLen) return;
+    if ((size_t)count > oldLen - idx) {
+        count = (int)(oldLen - idx);
+    }
+    clipboard = (char*)malloc(count + 1);
+    if (!clipboard) return;
+    memcpy(clipboard, text + idx, count);
+    clipboard[count] = '\0';
+}
+
+void Functionality::cutText(int line, int index, int count) {
+    if (!text || count <= 0) return;
+    free(clipboard);
+    size_t oldLen = strlen(text);
+    size_t idx = getGlobalIndex(line, index);
+    if (idx >= oldLen) return;
+    if ((size_t)count > oldLen - idx) {
+        count = (int)(oldLen - idx);
+    }
+    clipboard = (char*)malloc(count + 1);
+    if (!clipboard) return;
+    memcpy(clipboard, text + idx, count);
+    clipboard[count] = '\0';
+
+    // Видаляємо вирізані символи
+    size_t newLen = oldLen - count;
+    memmove(text + idx, text + idx + count, oldLen - idx - count + 1);
+    char* tmp = (char*)realloc(text, newLen + 1);
+    if (tmp) text = tmp;
+}
+
+void Functionality::pasteText(int line, int index) {
+    if (!clipboard) return;
+    size_t addLen = strlen(clipboard);
+    char* copyText = strdup(clipboard);
+    relocateMemory(copyText, index, line);
 }

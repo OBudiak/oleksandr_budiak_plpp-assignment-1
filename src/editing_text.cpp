@@ -39,3 +39,82 @@ void EditingText::insertTextOnPosition() {
     if (!newText) return;
     functionality.relocateMemory(newText, x, y);
 }
+
+void EditingText::deleteText() {
+    cout << "  -Delete text-  " << endl;
+    cout << "Choose line, index and number of symbols: ";
+    char* tmpInput = functionality.readline();
+    if (!tmpInput) return;
+    int line = 0, index = 0, count = 0;
+    if (sscanf(tmpInput, "%d %d %d", &line, &index, &count) != 3) {
+        cout << "Uncorrect parameters" << endl;
+        free(tmpInput);
+        return;
+    }
+    free(tmpInput);
+    functionality.deleteText(line, index, count);
+}
+
+void EditingText::insertWithReplacement() {
+    cout << "  -Insert with replacement-  " << endl;
+    cout << "Choose line and index: ";
+    char* tmpInput = functionality.readline();
+    if (!tmpInput) return;
+    int line = 0, index = 0;
+    if (sscanf(tmpInput, "%d %d", &line, &index) != 2) {
+        cout << "Uncorrect parameters" << endl;
+        free(tmpInput);
+        return;
+    }
+    free(tmpInput);
+
+    cout << "Write text: ";
+    char* newText = functionality.readline();
+    if (!newText) return;
+    functionality.insertWithReplacement(line, index, newText);
+}
+
+void EditingText::copyText() {
+    cout << "  -Copy text-  " << endl;
+    cout << "Choose line and index and number of symbols: ";
+    char* tmpInput = functionality.readline();
+    if (!tmpInput) return;
+    int line = 0, index = 0, count = 0;
+    if (sscanf(tmpInput, "%d %d %d", &line, &index, &count) != 3) {
+        cout << "Uncorrect parameters" << endl;
+        free(tmpInput);
+        return;
+    }
+    free(tmpInput);
+    functionality.copyText(line, index, count);
+}
+
+void EditingText::cutText() {
+    cout << "  -Cut text-  " << endl;
+    cout << "Choose line and index and number of symbols: ";
+    char* tmpInput = functionality.readline();
+    if (!tmpInput) return;
+    int line = 0, index = 0, count = 0;
+    if (sscanf(tmpInput, "%d %d %d", &line, &index, &count) != 3) {
+        cout << "Uncorrect parameters" << endl;
+        free(tmpInput);
+        return;
+    }
+    free(tmpInput);
+    functionality.cutText(line, index, count);
+}
+
+void EditingText::pasteText() {
+    cout << "  -Paste text-  " << endl;
+    cout << "Choose line and index: ";
+    char* tmpInput = functionality.readline();
+    if (!tmpInput) return;
+    int line = 0, index = 0;
+    if (sscanf(tmpInput, "%d %d", &line, &index) != 2) {
+        cout << "Uncorrect parameters" << endl;
+        free(tmpInput);
+        return;
+    }
+    free(tmpInput);
+    functionality.pasteText(line, index);
+}
