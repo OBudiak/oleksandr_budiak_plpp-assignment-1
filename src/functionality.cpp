@@ -5,11 +5,20 @@ using namespace std;
 Functionality::Functionality() {
     text = NULL;
     clipboard = NULL;
+    historySize = 0;
+    historyPos = -1;
+    redoStartingPos = -1;
+    for (int i = 0; i < MAX_HISTORY; i++) {
+        history[i] = NULL;
+    }
 }
 
 Functionality::~Functionality() {
     free(text);
     free(clipboard);
+    for (int i = 0; i < historySize; i++) {
+        free(history[i]);
+    }
 }
 
 char* Functionality::readline() {
@@ -116,6 +125,7 @@ void Functionality::relocateMemory(char* newText, int x, int y) {
     }
     text[oldLen + addLen] = '\0';
     free(newText);
+    saveCur();
 }
 
 void Functionality::saveInFile() {
@@ -237,11 +247,11 @@ void Functionality::deleteText(int line, int index, int count) {
     if (tmp) {
         text = tmp;
     }
+    saveCur();
 }
 
 void Functionality::insertWithReplacement(int line, int index, const char* newText) {
     if (!text) {
-        // якщо порожній, просто вставляємо новий
         char* copyText = strdup(newText);
         relocateMemory(copyText, -1, -1);
         return;
@@ -251,7 +261,6 @@ void Functionality::insertWithReplacement(int line, int index, const char* newTe
     size_t idx = getGlobalIndex(line, index);
     if (idx > oldLen) idx = oldLen;
 
-    // Видаляємо символи довжиною newText, якщо вони є
     if (idx < oldLen) {
         size_t endRemove = idx + addLen;
         if (endRemove > oldLen) endRemove = oldLen;
@@ -262,7 +271,6 @@ void Functionality::insertWithReplacement(int line, int index, const char* newTe
         if (shrink) text = shrink;
     }
 
-    // Вставляємо newText на позицію idx
     char* copyText = strdup(newText);
     relocateMemory(copyText, index, line);
 }
@@ -296,11 +304,11 @@ void Functionality::cutText(int line, int index, int count) {
     memcpy(clipboard, text + idx, count);
     clipboard[count] = '\0';
 
-    // Видаляємо вирізані символи
     size_t newLen = oldLen - count;
     memmove(text + idx, text + idx + count, oldLen - idx - count + 1);
     char* tmp = (char*)realloc(text, newLen + 1);
     if (tmp) text = tmp;
+    saveCur();
 }
 
 void Functionality::pasteText(int line, int index) {
@@ -308,4 +316,48 @@ void Functionality::pasteText(int line, int index) {
     size_t addLen = strlen(clipboard);
     char* copyText = strdup(clipboard);
     relocateMemory(copyText, index, line);
+}
+
+void Functionality::saveCur() {
+    if (historySize < MAX_HISTORY) {
+        historySize++;
+        historyPos = historySize - 1;
+    } else {
+        free(history[0]);
+        for (int i = 1; i < MAX_HISTORY; i++) {
+            history[i - 1] = history[i];
+        }
+        historyPos = MAX_HISTORY - 1;
+    }
+
+    if (text) {
+        history[historyPos] = strdup(text);
+    } else {
+        history[historyPos] = strdup("");
+    }
+
+    redoStartingPos = -1;
+}
+
+void Functionality::undoText() {
+    if (historySize == 0 || historyPos <= 0) {
+        cout << "Nothing to undo" << endl;
+        return;
+    }
+    int targetPos = historyPos - 1;
+    free(text);
+    text = strdup(history[targetPos]);
+    historyPos = targetPos;
+    redoStartingPos = historyPos + 1;
+}
+
+void Functionality::redoText() {
+    if (redoStartingPos < 0 || redoStartingPos >= historySize) {
+        cout << "Nothing to redo" << endl;
+        return;
+    }
+    free(text);
+    text = strdup(history[redoStartingPos]);
+    historyPos = redoStartingPos;
+    redoStartingPos = historyPos + 1 < historySize ? historyPos + 1 : -1;
 }

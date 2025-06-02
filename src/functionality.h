@@ -33,6 +33,14 @@ private:
     char* clipboard;
 
     size_t getGlobalIndex(int line, int index);
+
+    static const int MAX_HISTORY = 5;
+    char* history[MAX_HISTORY];
+    int historySize;
+    int historyPos;
+    int redoStartingPos;
+
+    void saveCur();
 };
 
 #endif

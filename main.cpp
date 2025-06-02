@@ -13,6 +13,7 @@ void instruction() {
     cout << "Insert text by coordinates - 6" << endl;
     cout << "Search in text - 7" << endl;
     cout << "Delete text - 8" << endl;
+    cout << "Undo/Redo text - 9, 10" << endl;
     cout << "Cut/Paste/Copy text - 11, 12, 13" << endl;
     cout << "Insert with replacement - 14" << endl;
     cout << "Instruction - i" << endl;
@@ -45,6 +46,12 @@ int chooseCommand(int command, EditingText& editor, Functionality& func) {
         case 8:
             editor.deleteText();
             break;
+        case 9:
+            func.undoText();
+            break;
+        case 10:
+            func.redoText();
+            break;
         case 11:
             editor.cutText();
             break;
@@ -57,13 +64,12 @@ int chooseCommand(int command, EditingText& editor, Functionality& func) {
         case 14:
             editor.insertWithReplacement();
             break;
-        case 32759:
+        case 'i':
             instruction();
             break;
         case 0:
             return 0;
         default:
-            cout << (int)'i';
             cout << "Invalid command, please try again" << endl;
             return -1;
     }
