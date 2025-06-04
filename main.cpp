@@ -99,6 +99,7 @@ int main() {
         free(input);
 
         if (count == 0) break;
+        count = -1;
     }
     return 0;
 }
