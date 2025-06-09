@@ -1,7 +1,9 @@
-﻿#include <iostream>
+﻿#include <windows.h>
+#include <iostream>
 #include <cstring>
 #include "src/functionality.cpp"
 #include "src/editing_text.cpp"
+#include "mylib.h"
 
 using namespace std;
 
@@ -77,6 +79,37 @@ int chooseCommand(int command, EditingText& editor, Functionality& func) {
 }
 
 int main() {
+    HINSTANCE h = LoadLibrary(TEXT("caesar.dll"));
+    if (!h) {
+        std::cerr << "Cannot load DLL\n";
+        return 1;
+    }
+
+    // 2) Оголошуємо типи функцій, які будемо витягувати:
+    //    сигнатура повинна точно відповідати тій, що у caesar.h
+    typedef char* (*enc_t)(char*, int);
+    typedef char* (*dec_t)(char*, int);
+
+    // 3) Шукаємо в DLL функцію за іменем
+    enc_t enc = (enc_t)GetProcAddress(h, "encrypt");
+    dec_t dec = (dec_t)GetProcAddress(h, "decrypt");
+    if (!enc || !dec) {
+        std::cerr << "Function not found in DLL\n";
+        FreeLibrary(h);
+        return 1;
+    }
+    char text[] = "Hello, World!";
+    char* e = enc(text, 3);
+    std::cout << "Encrypted: " << e << "\n";
+
+    char* d = dec(e, 3);
+    std::cout << "Decrypted: " << d << "\n";
+
+    // 5) Звільняємо пам’ять, призначену у DLL, і саму DLL
+    delete[] e;
+    delete[] d;
+    FreeLibrary(h);
+
     cout << "Welcome to text Editor V0.1" << endl;
     instruction();
 
